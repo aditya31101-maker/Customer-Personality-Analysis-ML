@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="hero">
+    <div class="hero-copy">
+        <p class="eyebrow">Unsupervised ML Segmentation</p>
+        <h1>Strategic Customer Personality Analysis</h1>
+        <p class="hero-text">
+            Upload the Kaggle Customer Personality Analysis dataset or use the default file to generate engineered features,
+            K-Means customer segments, PCA visualizations, and business-ready cluster narratives.
+        </p>
+    </div>
+    <div class="hero-card">
+        <form method="POST" enctype="multipart/form-data" class="analysis-form">
+            <label class="radio-group">
+                <input type="radio" name="dataset_source" value="default" checked>
+                <span>Use default dataset</span>
+            </label>
+            <label class="radio-group">
+                <input type="radio" name="dataset_source" value="upload">
+                <span>Upload a dataset</span>
+            </label>
+            <label for="dataset_file" class="field-label">CSV / TSV / TXT file</label>
+            <input type="file" id="dataset_file" name="dataset_file" accept=".csv,.tsv,.txt">
+            <button type="submit">Run Analysis</button>
+            {% if not default_dataset_exists %}
+                <p class="helper">Default dataset missing. Place the Kaggle file in <code>data/marketing_campaign.csv</code> or upload it here.</p>
+            {% endif %}
+        </form>
+    </div>
+</section>
+
+{% if error %}
+<section class="panel error-panel">
+    <h2>Analysis Error</h2>
+    <p>{{ error }}</p>
+</section>
+{% endif %}
+
+{% if result %}
+<section class="results-grid">
+    <article class="panel metric-panel">
+        <h2>Run Summary</h2>
+        <div class="metrics">
+            <div><span>Rows</span><strong>{{ result.row_count }}</strong></div>
+            <div><span>Columns</span><strong>{{ result.column_count }}</strong></div>
+            <div><span>Optimal K</span><strong>{{ result.optimal_k }}</strong></div>
+            <div><span>Best Silhouette</span><strong>{{ result.silhouette_score }}</strong></div>
+        </div>
+        <p class="dataset-note">Dataset: {{ result.dataset_path }}</p>
+    </article>
+
+    <article class="panel">
+        <h2>Cluster Distribution</h2>
+        <div class="chip-row">
+            {% for cluster_id, count in result.cluster_counts.items() %}
+                <span class="chip">Cluster {{ cluster_id }}: {{ count }}</span>
+            {% endfor %}
+        </div>
+    </article>
+
+    <article class="panel chart-panel">
+        <h2>Elbow + Silhouette</h2>
+        <img src="{{ url_for('static', filename=result.elbow_plot) }}" alt="Elbow and silhouette chart">
+    </article>
+
+    <article class="panel chart-panel">
+        <h2>PCA Cluster View</h2>
+        <img src="{{ url_for('static', filename=result.pca_plot) }}" alt="PCA cluster chart">
+    </article>
+</section>
+
+<section class="panel">
+    <h2>Cluster Labels and Business Insights</h2>
+    <div class="cluster-cards">
+        {% for cluster in result.cluster_profiles %}
+            <article class="cluster-card">
+                <div class="cluster-topline">
+                    <span class="cluster-id">Cluster {{ cluster.cluster_id }}</span>
+                    <strong>{{ cluster.label }}</strong>
+                    <span class="cluster-size">{{ cluster.size }} customers</span>
+                </div>
+                <div class="summary-grid">
+                    {% for key, value in cluster.summary.items() %}
+                        {% if loop.index <= 8 %}
+                            <div>
+                                <span>{{ key }}</span>
+                                <strong>{{ value }}</strong>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                <ul class="insight-list">
+                    {% for insight in cluster.insights %}
+                        <li>{{ insight }}</li>
+                    {% endfor %}
+                </ul>
+            </article>
+        {% endfor %}
+    </div>
+</section>
+
+<section class="panel">
+    <h2>Clustered Data Preview</h2>
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    {% for column in result.preview_columns %}
+                        <th>{{ column }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in result.preview_rows %}
+                    <tr>
+                        {% for column in result.preview_columns %}
+                            <td>{{ row[column] }}</td>
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endif %}
+{% endblock %}
