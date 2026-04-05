@@ -1,3 +1,15 @@
+# Customer-Personality-Analysis-ML
+
+## Abstract
+In today’s data-driven world, understanding customer behavior is essential for businesses to design effective marketing strategies. This project focuses on Customer Personality Analysis using machine learning techniques on a Kaggle dataset. The main objective is to analyze customer demographics, purchasing patterns, and lifestyle attributes to identify meaningful customer segments.
+
+Unsupervised learning techniques such as K-Means clustering are applied to group customers based on similarities, while PCA is used for dimensionality reduction and better visualization. The dataset includes features such as income, education, spending habits, and campaign responses.
+
+The results of this project help businesses improve targeted marketing, customer retention, and decision-making by identifying valuable customer groups.
+
+## Project Description
+An Unsupervised Learning project to segment customers using K-Means and PCA.
+
 # Strategic Customer Personality Analysis via Unsupervised Machine Learning
 
 This project is a production-ready Flask application that performs customer segmentation on the Kaggle **Customer Personality Analysis** dataset. It includes preprocessing, feature engineering, K-Means clustering, elbow and silhouette-based cluster selection, PCA visualization, and business-friendly cluster insights.
